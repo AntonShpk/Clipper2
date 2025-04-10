@@ -30,7 +30,7 @@ TEST(Clipper2Tests, TestMultiplePolygons)
     Clipper2Lib::Paths64 solution, solution_open;
     Clipper2Lib::ClipType ct;
     Clipper2Lib::FillRule fr;
-    int64_t stored_area, stored_count;
+      __int128_t stored_area, stored_count;
     if (!LoadTestNum(ifs, test_number,
       subject, subject_open, clip, stored_area, stored_count, ct, fr)) break;
     // check Paths64 solutions
@@ -39,8 +39,8 @@ TEST(Clipper2Tests, TestMultiplePolygons)
     c.AddOpenSubject(subject_open);
     c.AddClip(clip);
     c.Execute(ct, fr, solution, solution_open);
-    const int64_t measured_area = static_cast<int64_t>(Area(solution));
-    const int64_t measured_count = static_cast<int64_t>(solution.size() + solution_open.size());
+    const __int128_t measured_area = static_cast<__int128_t>(Area(solution));
+    const __int128_t measured_count = static_cast<__int128_t>(solution.size() + solution_open.size());
     // check the polytree variant too
     Clipper2Lib::PolyTree64 solution_polytree;
     Clipper2Lib::Paths64 solution_polytree_open;

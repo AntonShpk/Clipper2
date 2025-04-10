@@ -30,8 +30,8 @@ static bool CreatePolyPath64FromCPolyPath(CPolyPath64& v, PolyPath64& owner)
 static bool BuildPolyTree64FromCPolyTree(CPolyTree64 tree, PolyTree64& result)
 {
   result.Clear();
-  int64_t* v = tree;
-  int64_t array_len = *v++, child_count = *v++;
+  __int128_t* v = tree;
+    __int128_t array_len = *v++, child_count = *v++;
   for (size_t i = 0; i < child_count; ++i)
     if (!CreatePolyPath64FromCPolyPath(v, result)) return false;
   return true;
@@ -143,7 +143,7 @@ TEST(Clipper2Tests, ExportHeaderTree64)
   // and it was called by a non C++ application, it would crash that application.
   CPaths64 c_subj = CreateCPathsFromPathsT(subj);
   CPaths64 c_clip = CreateCPathsFromPathsT(clip);
-  int64_t* c_sol_tree = nullptr;
+    __int128_t* c_sol_tree = nullptr;
   BooleanOp_PolyTree64(Intersection, EvenOdd, c_subj, c_subj_open, c_clip, c_sol_tree, c_sol_open);
   PolyTree64 sol_tree;
   // convert CPolyTree64 to PolyTree64

@@ -104,7 +104,7 @@ namespace Clipper2Lib {
 	struct Active {
 		Point64 bot;
 		Point64 top;
-		int64_t curr_x = 0;		//current (updated at every new scanline)
+		__int128_t curr_x = 0;		//current (updated at every new scanline)
 		double dx = 0.0;
 		int wind_dx = 1;			//1 or -1 depending on winding direction
 		int wind_cnt = 0;
@@ -194,7 +194,7 @@ namespace Clipper2Lib {
 		ClipType cliptype_ = ClipType::NoClip;
 		FillRule fillrule_ = FillRule::EvenOdd;
 		FillRule fillpos = FillRule::Positive;
-		int64_t bot_y_ = 0;
+        __int128_t bot_y_ = 0;
 		bool minima_list_sorted_ = false;
 		bool using_polytree_ = false;
 		Active* actives_ = nullptr;
@@ -202,14 +202,14 @@ namespace Clipper2Lib {
 		LocalMinimaList minima_list_;		//pointers in case of memory reallocs
 		LocalMinimaList::iterator current_locmin_iter_;
 		std::vector<Vertex*> vertex_lists_;
-		std::priority_queue<int64_t> scanline_list_;
+		std::priority_queue<__int128_t> scanline_list_;
 		IntersectNodeList intersect_nodes_;
         HorzSegmentList horz_seg_list_;
 		std::vector<HorzJoin> horz_join_list_;
 		void Reset();
-		inline void InsertScanline(int64_t y);
-		inline bool PopScanline(int64_t &y);
-		inline bool PopLocalMinima(int64_t y, LocalMinima*& local_minima);
+		inline void InsertScanline(__int128_t y);
+		inline bool PopScanline(__int128_t &y);
+		inline bool PopLocalMinima(__int128_t y, LocalMinima*& local_minima);
 		void DisposeAllOutRecs();
 		void DisposeVerticesAndLocalMinima();
 		void DeleteEdges(Active*& e);
@@ -218,7 +218,7 @@ namespace Clipper2Lib {
 		inline bool IsContributingOpen(const Active &e) const;
 		void SetWindCountForClosedPathEdge(Active &edge);
 		void SetWindCountForOpenPathEdge(Active &e);
-		void InsertLocalMinimaIntoAEL(int64_t bot_y);
+		void InsertLocalMinimaIntoAEL(__int128_t bot_y);
 		void InsertLeftEdge(Active &e);
 		inline void PushHorz(Active &e);
 		inline bool PopHorz(Active *&e);
@@ -226,10 +226,10 @@ namespace Clipper2Lib {
 		inline void UpdateEdgeIntoAEL(Active *e);
 		void IntersectEdges(Active &e1, Active &e2, const Point64& pt);
 		inline void DeleteFromAEL(Active &e);
-		inline void AdjustCurrXAndCopyToSEL(const int64_t top_y);
-		void DoIntersections(const int64_t top_y);
-		void AddNewIntersectNode(Active &e1, Active &e2, const int64_t top_y);
-		bool BuildIntersectList(const int64_t top_y);
+		inline void AdjustCurrXAndCopyToSEL(const __int128_t top_y);
+		void DoIntersections(const __int128_t top_y);
+		void AddNewIntersectNode(Active &e1, Active &e2, const __int128_t top_y);
+		bool BuildIntersectList(const __int128_t top_y);
 		void ProcessIntersectList();
 		void SwapPositionsInAEL(Active& edge1, Active& edge2);
 		OutRec* NewOutRec();
@@ -239,8 +239,8 @@ namespace Clipper2Lib {
 		OutPt* AddLocalMaxPoly(Active &e1, Active &e2, const Point64& pt);
 		void DoHorizontal(Active &horz);
 		bool ResetHorzDirection(const Active &horz, const Vertex* max_vertex,
-			int64_t &horz_left, int64_t &horz_right);
-		void DoTopOfScanbeam(const int64_t top_y);
+                                __int128_t &horz_left, __int128_t &horz_right);
+		void DoTopOfScanbeam(const __int128_t top_y);
 		Active *DoMaxima(Active &e);
 		void JoinOutrecPaths(Active &e1, Active &e2);
 		void FixSelfIntersects(OutRec* outrec);
@@ -284,7 +284,7 @@ namespace Clipper2Lib {
 		void Clear();
 		void AddReuseableData(const ReuseableDataContainer64& reuseable_data);
 #ifdef USINGZ
-		int64_t DefaultZ = 0;
+		__int128_t DefaultZ = 0;
 #endif
 	};
 
@@ -376,7 +376,7 @@ namespace Clipper2Lib {
 		double Area() const
 		{
 			return std::accumulate(childs_.cbegin(), childs_.cend(),
-				Clipper2Lib::Area<int64_t>(polygon_),
+				Clipper2Lib::Area<__int128>(polygon_),
 				[](double a, const auto& child) {return a + child->Area(); });
 		}
 
@@ -397,7 +397,7 @@ namespace Clipper2Lib {
 		{
 			scale_ = parent ? parent->scale_ : 1.0;
 			int error_code = 0;
-			polygon_ = ScalePath<double, int64_t>(path, scale_, error_code);
+			polygon_ = ScalePath<double, __int128>(path, scale_, error_code);
 		}
 
 		explicit PolyPathD(PolyPathD* parent, const PathD& path) : PolyPath(parent)
@@ -572,17 +572,17 @@ namespace Clipper2Lib {
 
 		void AddSubject(const PathsD& subjects)
 		{
-			AddPaths(ScalePaths<int64_t, double>(subjects, scale_, error_code_), PathType::Subject, false);
+			AddPaths(ScalePaths<__int128, double>(subjects, scale_, error_code_), PathType::Subject, false);
 		}
 
 		void AddOpenSubject(const PathsD& open_subjects)
 		{
-			AddPaths(ScalePaths<int64_t, double>(open_subjects, scale_, error_code_), PathType::Subject, true);
+			AddPaths(ScalePaths<__int128, double>(open_subjects, scale_, error_code_), PathType::Subject, true);
 		}
 
 		void AddClip(const PathsD& clips)
 		{
-			AddPaths(ScalePaths<int64_t, double>(clips, scale_, error_code_), PathType::Clip, false);
+			AddPaths(ScalePaths<__int128, double>(clips, scale_, error_code_), PathType::Clip, false);
 		}
 
 		bool Execute(ClipType clip_type, FillRule fill_rule, PathsD& closed_paths)

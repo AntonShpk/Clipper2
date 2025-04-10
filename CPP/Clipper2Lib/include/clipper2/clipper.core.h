@@ -62,6 +62,7 @@ namespace Clipper2Lib
   const int CLIPPER2_MAX_DEC_PRECISION = 8; // see Discussions #564
 #endif
 
+//TODO ---------------------
   static const int64_t MAX_COORD = INT64_MAX >> 2;
   static const int64_t MIN_COORD = -MAX_COORD;
   static const int64_t INVALID = INT64_MAX;
@@ -108,7 +109,7 @@ namespace Clipper2Lib
   enum class FillRule { EvenOdd, NonZero, Positive, Negative };
 
 #ifdef USINGZ
-  using z_type = int64_t;
+  using z_type = __int128;
 #endif
 
   // Point ------------------------------------------------------------------------
@@ -203,9 +204,9 @@ namespace Clipper2Lib
       return Point(x * scale, y * scale);
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Point& point)
+    friend std::ostream& operator<<(std::ostream& os, [[maybe_unused]]const Point& point)
     {
-      os << point.x << "," << point.y;
+//      os << point.x << "," << point.y;
       return os;
     }
 #endif
@@ -240,7 +241,7 @@ namespace Clipper2Lib
   };
 
   //nb: using 'using' here (instead of typedef) as they can be used in templates
-  using Point64 = Point<int64_t>;
+  using Point64 = Point<__int128>;
   using PointD = Point<double>;
 
   template <typename T>
@@ -262,14 +263,14 @@ namespace Clipper2Lib
     return polys;
   }
 
-  using Path64 = Path<int64_t>;
+  using Path64 = Path<__int128>;
   using PathD = Path<double>;
   using Paths64 = std::vector< Path64>;
   using PathsD = std::vector< PathD>;
 
   static const Point64 InvalidPoint64 = Point64(
-    (std::numeric_limits<int64_t>::max)(),
-    (std::numeric_limits<int64_t>::max)());
+    (std::numeric_limits<__int128>::max)(),
+    (std::numeric_limits<__int128>::max)());
   static const PointD InvalidPointD = PointD(
     (std::numeric_limits<double>::max)(),
     (std::numeric_limits<double>::max)());
@@ -288,7 +289,7 @@ namespace Clipper2Lib
   template <typename T>
   struct Rect;
 
-  using Rect64 = Rect<int64_t>;
+  using Rect64 = Rect<__int128>;
   using RectD = Rect<double>;
 
   template <typename T>
@@ -694,7 +695,7 @@ namespace Clipper2Lib
     CheckPrecisionRange(precision, error_code);
   }
 
-  inline int TriSign(int64_t x) // returns 0, 1 or -1
+  inline int TriSign(__int128 x) // returns 0, 1 or -1
   {
     return (x > 0) - (x < 0); 
   }
@@ -728,10 +729,11 @@ namespace Clipper2Lib
   inline bool ProductsAreEqual(int64_t a, int64_t b, int64_t c, int64_t d)
   {
 #if (defined(__clang__) || defined(__GNUC__)) && UINTPTR_MAX >= UINT64_MAX
-    const auto ab = static_cast<__int128_t>(a) * static_cast<__int128_t>(b);
-    const auto cd = static_cast<__int128_t>(c) * static_cast<__int128_t>(d);
+    const auto ab = static_cast<__uint128_t>(a) * static_cast<__uint128_t>(b);
+    const auto cd = static_cast<__uint128_t>(c) * static_cast<__uint128_t>(d);
     return ab == cd;
 #else
+    assert(false);
     // nb: unsigned values needed for calculating overflow carry
     const auto abs_a = static_cast<uint64_t>(std::abs(a));
     const auto abs_b = static_cast<uint64_t>(std::abs(b));
