@@ -435,7 +435,7 @@ namespace Clipper2Lib {
 
   inline bool PtsReallyClose(const Point64& pt1, const Point64& pt2)
   {
-    return ((pt1.x - pt2.x) < 2 && (pt1.y - pt2.y) < 2) || ((pt2.x - pt1.x) < 2 && (pt2.y - pt1.y) < 2);
+      return (std::abs(pt1.x - pt2.x) < 2) && (std::abs(pt1.y - pt2.y) < 2);
   }
 
   inline bool IsVerySmallTriangle(const OutPt& op)

@@ -20,7 +20,7 @@ TEST(Clipper2Tests, TestMultipleLines) {
     c.AddClip(clip);
     EXPECT_TRUE(c.Execute(ct, fr, solution, solution_open));
     const __int128_t count2 = solution.size() + solution_open.size();
-    const __int128_t count_diff = count2 > count ? count2 - count : count - count2;
+    const __int128_t count_diff = std::abs(count2 - count);
     const double relative_count_diff = count ?
       count_diff / static_cast<double>(count) :
       0;

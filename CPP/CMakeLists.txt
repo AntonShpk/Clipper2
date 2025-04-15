@@ -27,6 +27,7 @@ set(CLIPPER2_MAX_DECIMAL_PRECISION 8 CACHE STRING "Maximum decimal precision ran
 
 if (APPLE)
     set(CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "" FORCE)
 endif ()
 
 include(GNUInstallDirs)
@@ -255,6 +256,7 @@ endif()
       # set a working directory to your project root so that you can find test data via paths relative to the project root
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../Tests
       PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
+      DISCOVERY_MODE PRE_TEST
     )
   endif()
 
@@ -268,6 +270,7 @@ endif()
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../Tests
       PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
       TEST_SUFFIX "_USINGZ"
+      DISCOVERY_MODE PRE_TEST
     )
   endif()
 

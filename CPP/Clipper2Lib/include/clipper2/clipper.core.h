@@ -19,6 +19,12 @@
 #include <numeric>
 #include <cmath>
 
+namespace std {
+    __extension__ inline constexpr __int128 abs(__int128 __x) {
+        return __x >= 0 ? __x : -__x;
+    }
+}
+
 namespace Clipper2Lib
 {
 
@@ -62,10 +68,14 @@ namespace Clipper2Lib
   const int CLIPPER2_MAX_DEC_PRECISION = 8; // see Discussions #564
 #endif
 
-//TODO ---------------------
-  static const int64_t MAX_COORD = INT64_MAX >> 2;
-  static const int64_t MIN_COORD = -MAX_COORD;
-  static const int64_t INVALID = INT64_MAX;
+  static const __uint128_t UINT128_MAX =__uint128_t(__int128_t(-1L));
+  static const __int128_t INT128_MAX = UINT128_MAX >> 1;
+  static const __int128_t INT128_MIN = -INT128_MAX - 1;
+
+  static const __int128_t MAX_COORD = INT128_MAX >> 2;
+  static const __int128_t MIN_COORD = -MAX_COORD;
+  static const __int128_t INVALID = INT128_MAX;
+
   const double max_coord = static_cast<double>(MAX_COORD);
   const double min_coord = static_cast<double>(MIN_COORD);
 
@@ -204,9 +214,11 @@ namespace Clipper2Lib
       return Point(x * scale, y * scale);
     }
 
-    friend std::ostream& operator<<(std::ostream& os, [[maybe_unused]]const Point& point)
-    {
-//      os << point.x << "," << point.y;
+      friend std::ostream& operator<<(std::ostream& os, [[maybe_unused]]const Point& point)
+    {//TODO
+//      constexpr const __int128_t bottom_mask = (__int128_t{1} << 64) - 1;
+//      constexpr const __int128_t top_mask = ~bottom_mask;
+       // os << static_cast<int64_t>(point.x & bottom_mask) << static_cast<int64_t>((point.x & top_mask) >> 64)  << "," << os << static_cast<int64_t>(point.y & bottom_mask) << static_cast<int64_t>((point.y & top_mask) >> 64);
       return os;
     }
 #endif
@@ -702,8 +714,8 @@ namespace Clipper2Lib
 
   struct MultiplyUInt64Result
   {
-    const uint64_t result = 0;
-    const uint64_t carry = 0;
+    const __uint128_t result = 0;
+    const __uint128_t carry = 0;
 
     bool operator==(const MultiplyUInt64Result& other) const
     {
@@ -711,34 +723,33 @@ namespace Clipper2Lib
     };
   };
 
-  inline MultiplyUInt64Result Multiply(uint64_t a, uint64_t b) // #834, #835
+  inline MultiplyUInt64Result Multiply(__uint128_t a, __uint128_t b) // #834, #835
   {
-    const auto lo = [](uint64_t x) { return x & 0xFFFFFFFF; };
-    const auto hi = [](uint64_t x) { return x >> 32; };
+    const auto lo = [](__uint128_t x) { return x & 0xFFFFFFFFFFFFFFFF; };
+    const auto hi = [](__uint128_t x) { return x >> 64; };
 
-    const uint64_t x1 = lo(a) * lo(b);
-    const uint64_t x2 = hi(a) * lo(b) + hi(x1);
-    const uint64_t x3 = lo(a) * hi(b) + lo(x2);
-    const uint64_t result = lo(x3) << 32 | lo(x1);
-    const uint64_t carry = hi(a) * hi(b) + hi(x2) + hi(x3);
+    const __uint128_t x1 = lo(a) * lo(b);
+    const __uint128_t x2 = hi(a) * lo(b) + hi(x1);
+    const __uint128_t x3 = lo(a) * hi(b) + lo(x2);
+    const __uint128_t result = lo(x3) << 64 | lo(x1);
+    const __uint128_t carry = hi(a) * hi(b) + hi(x2) + hi(x3);
 
     return { result, carry };
   }
 
   // returns true if (and only if) a * b == c * d
-  inline bool ProductsAreEqual(int64_t a, int64_t b, int64_t c, int64_t d)
+  inline bool ProductsAreEqual(__int128_t a, __int128_t b, __int128_t c, __int128_t d)
   {
 #if (defined(__clang__) || defined(__GNUC__)) && UINTPTR_MAX >= UINT64_MAX
     const auto ab = static_cast<__uint128_t>(a) * static_cast<__uint128_t>(b);
     const auto cd = static_cast<__uint128_t>(c) * static_cast<__uint128_t>(d);
     return ab == cd;
 #else
-    assert(false);
     // nb: unsigned values needed for calculating overflow carry
-    const auto abs_a = static_cast<uint64_t>(std::abs(a));
-    const auto abs_b = static_cast<uint64_t>(std::abs(b));
-    const auto abs_c = static_cast<uint64_t>(std::abs(c));
-    const auto abs_d = static_cast<uint64_t>(std::abs(d));
+    const auto abs_a = static_cast<__uint128_t>(std::abs(a));
+    const auto abs_b = static_cast<__uint128_t>(std::abs(b));
+    const auto abs_c = static_cast<__uint128_t>(std::abs(c));
+    const auto abs_d = static_cast<__uint128_t>(std::abs(d));
 
     const auto abs_ab = Multiply(abs_a, abs_b);
     const auto abs_cd = Multiply(abs_c, abs_d);

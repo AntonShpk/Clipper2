@@ -19,7 +19,7 @@ inline Path64 MakeStar(const Point64& center, int radius, int points)
 {
   if (!(points % 2)) --points;
   if (points < 5) points = 5;
-  Path64 tmp = Ellipse<int64_t>(center, radius, radius, points);
+  Path64 tmp = Ellipse<__int128_t>(center, radius, radius, points);
   Path64 result;
   result.reserve(points);
   result.push_back(tmp[0]);
@@ -39,7 +39,7 @@ void DoSimpleTest(bool show_solution_coords)
 
   Paths64 subject, clip;
   subject.push_back(MakeStar(Point64(225, 225), 220, 9));
-  clip.push_back(Ellipse<int64_t>(Point64(225,225), 150, 150));  
+  clip.push_back(Ellipse<__int128_t>(Point64(225,225), 150, 150));  
   
   //Intersect both shapes and then 'inflate' result -10 (ie deflate)
   solution = Intersect(subject, clip, fr);

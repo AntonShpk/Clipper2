@@ -61,7 +61,7 @@ void DoDiamonds()
       shape = TranslatePath(shape, size, (j & 1) == 0 ? size : -size);
       if (rand() % 7) subjects.push_back(shape);
     }
-    shape = TranslatePath(shape, static_cast<int64_t>(-w / size) * size, size*2);
+    shape = TranslatePath(shape, static_cast<__int128_t>(-w / size) * size, size*2);
   }
 
   solution = Union(subjects, FillRule::NonZero);
@@ -93,7 +93,7 @@ void DoSquares()
       if (rand() % 4 != 1) subjects.push_back(shape);
       shape = TranslatePath(shape, size, 0);
     }
-    shape = TranslatePath(shape, static_cast<int64_t>(-w / size) * size, size);
+    shape = TranslatePath(shape, static_cast<__int128_t>(-w / size) * size, size);
   }
   //SaveTest("squares.txt", false, &subjects, nullptr, nullptr, 0, 0, ClipType::Union, FillRule::NonZero);
 
@@ -154,8 +154,8 @@ void DoTriangles()
       tri1 = TranslatePath(tri1, size * 2, 0);
       tri2 = TranslatePath(tri2, size * 2, 0);
     }
-    tri1 = TranslatePath(tri1, static_cast<int64_t>(-w / size) * size, size * 2);
-    tri2 = TranslatePath(tri2, static_cast<int64_t>(-w / size) * size, size * 2);
+    tri1 = TranslatePath(tri1, static_cast<__int128_t>(-w / size) * size, size * 2);
+    tri2 = TranslatePath(tri2, static_cast<__int128_t>(-w / size) * size, size * 2);
   }
 
   solution = Union(subjects, fillrule);

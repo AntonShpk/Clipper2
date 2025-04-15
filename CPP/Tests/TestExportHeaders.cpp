@@ -7,13 +7,13 @@ using namespace Clipper2Lib;
 
 static bool CreatePolyPath64FromCPolyPath(CPolyPath64& v, PolyPath64& owner)
 {
-  int64_t poly_len = *v++, child_count = *v++;
+  __int128_t poly_len = *v++, child_count = *v++;
   if (!poly_len) return false;
   Path64 path;
   path.reserve(poly_len);
   for (size_t i = 0; i < poly_len; ++i)
   {
-    int64_t x = *v++, y = *v++;
+    __int128_t x = *v++, y = *v++;
 #ifdef USINGZ
     z_type z = Reinterpret<z_type>(*v++);
     path.push_back(Point64(x, y, z));
@@ -31,7 +31,7 @@ static bool BuildPolyTree64FromCPolyTree(CPolyTree64 tree, PolyTree64& result)
 {
   result.Clear();
   __int128_t* v = tree;
-    __int128_t array_len = *v++, child_count = *v++;
+  __int128_t array_len = *v++, child_count = *v++;
   for (size_t i = 0; i < child_count; ++i)
     if (!CreatePolyPath64FromCPolyPath(v, result)) return false;
   return true;
@@ -64,8 +64,8 @@ static bool BuildPolyTreeDFromCPolyTree(CPolyTreeD tree, PolyTreeD& result)
 {
   result.Clear();
   double* v = tree;
-  int64_t array_len   = static_cast<int64_t>(*v++);
-  int64_t child_count = static_cast<int64_t>(*v++);
+  __int128_t array_len   = static_cast<__int128_t>(*v++);
+  __int128_t child_count = static_cast<__int128_t>(*v++);
   for (size_t i = 0; i < child_count; ++i)
     if (!CreatePolyPathDFromCPolyPath(v, result)) return false;
   return true;
