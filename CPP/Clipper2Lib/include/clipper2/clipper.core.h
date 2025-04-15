@@ -180,9 +180,9 @@ namespace Clipper2Lib
 
     void SetZ(const z_type z_value) { z = z_value; }
 
-    friend std::ostream& operator<<(std::ostream& os, const Point& point)
-    {
-      os << point.x << "," << point.y << "," << point.z;
+    friend std::ostream& operator<<(std::ostream& os, [[maybe_unused]]const Point& point)
+    {// TODO
+    //      os << point.x << "," << point.y << "," << point.z;
       return os;
     }
 
