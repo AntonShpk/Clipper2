@@ -30,7 +30,7 @@ int main()
 void DoLoopThruPolygons(int start, int end)
 {
   Paths64 subject, subject_open, clip, solution, solution_open;
-  __int128_t stored_area, stored_count;
+  Int128 stored_area, stored_count;
   ClipType ct;
   FillRule fr;
   bool first_fail = true;

@@ -37,7 +37,7 @@ TEST(Clipper2Tests, TestIsCollinear) {
 
 TEST(Clipper2Tests, TestIsCollinear2) {
   // see https://github.com/AngusJohnson/Clipper2/issues/831
-  const __int128_t i = 0x4000000000000;
+  const Int128 i = 0x4000000000000;
   const Clipper2Lib::Path64 subject = {
     Clipper2Lib::Point64(-i, -i),
     Clipper2Lib::Point64( i, -i),

@@ -11,7 +11,7 @@ TEST(Clipper2Tests, TestMultipleLines) {
     Clipper2Lib::Paths64 solution, solution_open;
     Clipper2Lib::ClipType ct;
     Clipper2Lib::FillRule fr;
-      __int128_t area, count;
+      Int128 area, count;
     if (!LoadTestNum(ifs, test_number,
       subject, subject_open, clip, area, count, ct, fr)) break;
     Clipper2Lib::Clipper64 c;
@@ -19,8 +19,8 @@ TEST(Clipper2Tests, TestMultipleLines) {
     c.AddOpenSubject(subject_open);
     c.AddClip(clip);
     EXPECT_TRUE(c.Execute(ct, fr, solution, solution_open));
-    const __int128_t count2 = solution.size() + solution_open.size();
-    const __int128_t count_diff = std::abs(count2 - count);
+    const Int128 count2 = solution.size() + solution_open.size();
+    const Int128 count_diff = std::abs(count2 - count);
     const double relative_count_diff = count ?
       count_diff / static_cast<double>(count) :
       0;

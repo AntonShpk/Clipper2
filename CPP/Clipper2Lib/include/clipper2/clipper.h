@@ -168,7 +168,7 @@ namespace Clipper2Lib {
     return result;
   }
 
-  inline Path64 TranslatePath(const Path64& path, __int128_t dx, __int128_t dy)
+  inline Path64 TranslatePath(const Path64& path, Int128 dx, Int128 dy)
   {
     return TranslatePath<__int128>(path, dx, dy);
   }
@@ -188,7 +188,7 @@ namespace Clipper2Lib {
     return result;
   }
 
-  inline Paths64 TranslatePaths(const Paths64& paths, __int128_t dx, __int128_t dy)
+  inline Paths64 TranslatePaths(const Paths64& paths, Int128 dx, Int128 dy)
   {
     return TranslatePaths<__int128>(paths, dx, dy);
   }
@@ -219,7 +219,7 @@ namespace Clipper2Lib {
     CheckPrecisionRange(precision, error_code);
     if (error_code) return PathsD();
     const double scale = std::pow(10, precision);
-    Rect64 r = ScaleRect<__int128_t, double>(rect, scale);
+    Rect64 r = ScaleRect<Int128, double>(rect, scale);
     RectClip64 rc(r);
     Paths64 pp = ScalePaths<__int128, double>(paths, scale, error_code);
     if (error_code) return PathsD(); // ie: error_code result is lost
@@ -487,7 +487,7 @@ namespace Clipper2Lib {
     else
       for (size_t i = 0; i < size; ++i)
         result[i] = PointD(list[i * 3], list[i * 3 + 1],
-          static_cast<__int128_t>(list[i * 3 + 2]));
+          static_cast<Int128>(list[i * 3 + 2]));
     return result;
   }
 #endif

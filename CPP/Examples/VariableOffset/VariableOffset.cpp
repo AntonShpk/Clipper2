@@ -18,7 +18,7 @@ void System(const std::string& filename)
 
 void test1() {
 
-  __int128_t const scale = 10;
+  Int128 const scale = 10;
   double delta = 10 * scale;
 
   ClipperOffset co;
@@ -47,7 +47,7 @@ void test1() {
 
 void test2() {
 
-  __int128_t const scale = 10;
+  Int128 const scale = 10;
   double delta = 10 * scale;
 
   ClipperOffset co;
@@ -103,9 +103,9 @@ void test3() {
 
 void test4() {
 
-  __int128_t const scale = 100;
+  Int128 const scale = 100;
   Paths64 solution;
-  Paths64 subject = { Ellipse(ScaleRect<__int128_t,__int128_t>(Rect64(10, 10, 50, 50), scale)) };
+  Paths64 subject = { Ellipse(ScaleRect<Int128,Int128>(Rect64(10, 10, 50, 50), scale)) };
 
   ClipperOffset co;
   co.AddPaths(subject, JoinType::Round, EndType::Round);

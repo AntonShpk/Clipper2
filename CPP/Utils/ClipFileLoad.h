@@ -22,11 +22,11 @@ inline bool FileExists(const std::string& name)
 
 bool LoadTestNum(std::ifstream& source, int test_num,
   Clipper2Lib::Paths64& subj, Clipper2Lib::Paths64& subj_open, Clipper2Lib::Paths64& clip,
-                 __int128_t& area, __int128_t& count, Clipper2Lib::ClipType& ct, Clipper2Lib::FillRule& fr);
+                 Int128& area, Int128& count, Clipper2Lib::ClipType& ct, Clipper2Lib::FillRule& fr);
 
 static bool LoadTest(std::ifstream& source,
   Clipper2Lib::Paths64& subj, Clipper2Lib::Paths64& subj_open, Clipper2Lib::Paths64& clip,
-  __int128_t& area, __int128_t& count, Clipper2Lib::ClipType& ct, Clipper2Lib::FillRule& fr)
+  Int128& area, Int128& count, Clipper2Lib::ClipType& ct, Clipper2Lib::FillRule& fr)
 {
   return LoadTestNum(source, 1, subj, subj_open, clip, area, count, ct, fr);
 }

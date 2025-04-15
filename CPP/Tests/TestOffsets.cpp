@@ -14,7 +14,7 @@ TEST(Clipper2Tests, TestOffsets) {
     Paths64 solution, solution_open;
     ClipType ct = ClipType::NoClip;
     FillRule fr = FillRule::NonZero;
-    __int128_t stored_area = 0, stored_count = 0;
+    Int128 stored_area = 0, stored_count = 0;
     ASSERT_TRUE(LoadTestNum(ifs, test_number, subject, subject_open, clip, stored_area, stored_count, ct, fr));
     co.AddPaths(subject, JoinType::Round, EndType::Polygon);
     Paths64 outputs;
@@ -22,7 +22,7 @@ TEST(Clipper2Tests, TestOffsets) {
     // is the sum total area of the solution is positive
     const auto outer_is_positive = Area(outputs) > 0;
     // there should be exactly one exterior path
-    const auto is_positive_func = IsPositive<__int128_t>;
+    const auto is_positive_func = IsPositive<Int128>;
     const auto is_positive_count = std::count_if(
       outputs.begin(), outputs.end(), is_positive_func);
     const auto is_negative_count =
@@ -47,7 +47,7 @@ TEST(Clipper2Tests, TestOffsets2) { // see #448 & #456
   ClipperOffset c;
   subject.push_back(MakePath({ 50,50, 100,50, 100,150, 50,150, 0,100 }));
   int err;
-  subject = ScalePaths<__int128_t, __int128_t>(subject, scale, err);
+  subject = ScalePaths<Int128, Int128>(subject, scale, err);
   c.AddPaths(subject, JoinType::Round, EndType::Polygon);
   c.ArcTolerance(arc_tol);
   c.Execute(delta, solution);
@@ -372,7 +372,7 @@ TEST(Clipper2Tests, TestOffsets6) // also modified from #593 (tests rounded ends
   Clipper2Lib::Paths64 solution;
   offseter.Execute(offset, solution);
   EXPECT_EQ(solution.size(), 2);
-  double area = Area<__int128_t>(solution[1]);
+  double area = Area<Int128>(solution[1]);
   EXPECT_LT(area, -47500);
 }
 

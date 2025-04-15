@@ -11,7 +11,7 @@ TEST(Clipper2Tests, TestPolytreeHoles1)
   Paths64 solution_open;
   ClipType ct = ClipType::NoClip;
   FillRule fr = FillRule::EvenOdd;
-    __int128_t area = 0, count = 0;
+    Int128 area = 0, count = 0;
   bool success = false;
   ASSERT_TRUE(LoadTestNum(ifs, 1, subject, subject_open, clip, area, count, ct, fr));
   Clipper64 c;
@@ -67,7 +67,7 @@ TEST(Clipper2Tests, TestPolytreeHoles2)
   Paths64 subject, subject_open, clip;
   ClipType ct = ClipType::NoClip;
   FillRule fr = FillRule::EvenOdd;
-    __int128_t area = 0, count = 0;
+    Int128 area = 0, count = 0;
   ASSERT_TRUE(LoadTestNum(ifs, 1, subject, subject_open, clip, area, count, ct, fr));
   const std::vector<Point64> points_of_interest_outside = {
      Point64(21887, 10420),

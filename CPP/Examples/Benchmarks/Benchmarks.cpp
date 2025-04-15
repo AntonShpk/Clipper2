@@ -40,7 +40,7 @@ void RecheckLastBenchmark(bool use_polytree)
   FillRule fr;
 
   Paths64 subject, subj_open, clip, solution;
-  __int128_t area, count;
+  Int128 area, count;
   PolyTree64 polytree;
 
   std::ifstream test("benchmark_test.txt");

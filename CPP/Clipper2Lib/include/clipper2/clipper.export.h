@@ -120,13 +120,13 @@ the four vertices that define the two segments that are intersecting.
 
 namespace Clipper2Lib {
 
-typedef __int128_t* CPath64;
-typedef __int128_t* CPaths64;
+typedef Int128* CPath64;
+typedef Int128* CPaths64;
 typedef double*  CPathD;
 typedef double*  CPathsD;
 
-typedef __int128_t* CPolyPath64;
-typedef __int128_t* CPolyTree64;
+typedef Int128* CPolyPath64;
+typedef Int128* CPolyTree64;
 typedef double* CPolyPathD;
 typedef double* CPolyTreeD;
 
@@ -138,7 +138,7 @@ struct CRect {
   T bottom;
 };
 
-typedef CRect<__int128_t> CRect64;
+typedef CRect<Int128> CRect64;
 typedef CRect<double> CRectD;
 
 template <typename T>
@@ -177,7 +177,7 @@ inline T1 Reinterpret(T2 value) {
 
 EXTERN_DLL_EXPORT const char* Version();
 
-EXTERN_DLL_EXPORT void DisposeArray64(__int128_t*& p)
+EXTERN_DLL_EXPORT void DisposeArray64(Int128*& p)
 {
   delete[] p;
 }
@@ -480,16 +480,16 @@ static Paths64 ConvertCPathsDToPaths64(const CPathsD paths, double scale)
   return result;
 }
 
-static void CreateCPolyPath64(const PolyPath64* pp, __int128_t*& v)
+static void CreateCPolyPath64(const PolyPath64* pp, Int128*& v)
 {
-  *v++ = static_cast<__int128_t>(pp->Polygon().size());
-  *v++ = static_cast<__int128_t>(pp->Count());
+  *v++ = static_cast<Int128>(pp->Polygon().size());
+  *v++ = static_cast<Int128>(pp->Count());
   for (const Point64& pt : pp->Polygon())
   {
     *v++ = pt.x;
     *v++ = pt.y;
 #ifdef USINGZ   
-    * v++ = Reinterpret<__int128_t>(pt.z); // raw memory copy
+    * v++ = Reinterpret<Int128>(pt.z); // raw memory copy
 #endif
   }
   for (size_t i = 0; i < pp->Count(); ++i)
@@ -512,16 +512,16 @@ static void CreateCPolyPathD(const PolyPathD* pp, double*& v)
     CreateCPolyPathD(pp->Child(i), v);
 }
 
-static __int128_t* CreateCPolyTree64(const PolyTree64& tree)
+static Int128* CreateCPolyTree64(const PolyTree64& tree)
 {
   size_t cnt, array_len;
   GetPolytreeCountAndCStorageSize64(tree, cnt, array_len);
   if (!cnt) return nullptr;
   // allocate storage
-  __int128_t* result = new __int128_t[array_len];
-  __int128_t* v = result;
-  *v++ = static_cast<__int128_t>(array_len);
-  *v++ = static_cast<__int128_t>(tree.Count());
+  Int128* result = new Int128[array_len];
+  Int128* v = result;
+  *v++ = static_cast<Int128>(array_len);
+  *v++ = static_cast<Int128>(tree.Count());
   for (size_t i = 0; i < tree.Count(); ++i)
     CreateCPolyPath64(tree.Child(i), v);
   return result;
@@ -763,7 +763,7 @@ EXTERN_DLL_EXPORT CPathsD RectClipD(const CRectD& rect, const CPathsD paths, int
   const double scale = std::pow(10, precision);
 
   RectD r = CRectToRect(rect);
-  Rect64 rec = ScaleRect<__int128_t, double>(r, scale);
+  Rect64 rec = ScaleRect<Int128, double>(r, scale);
   Paths64 pp = ConvertCPathsDToPaths64(paths, scale);
   class RectClip64 rc(rec);
   Paths64 result = rc.Execute(pp);
@@ -789,7 +789,7 @@ EXTERN_DLL_EXPORT CPathsD RectClipLinesD(const CRectD& rect,
   if (precision < -8 || precision > 8) return nullptr;
 
   const double scale = std::pow(10, precision);
-  Rect64 r = ScaleRect<__int128_t, double>(CRectToRect(rect), scale);
+  Rect64 r = ScaleRect<Int128, double>(CRectToRect(rect), scale);
   class RectClipLines64 rcl(r);
   Paths64 pp = ConvertCPathsDToPaths64(paths, scale);
   Paths64 result = rcl.Execute(pp);

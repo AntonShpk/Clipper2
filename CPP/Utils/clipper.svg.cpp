@@ -77,7 +77,7 @@ namespace Clipper2Lib {
     int error_code = 0;
     if (path.size() == 0) return;
     PathsD tmp;
-    tmp.push_back(ScalePath<double, __int128_t>(path, scale_, error_code));
+    tmp.push_back(ScalePath<double, Int128>(path, scale_, error_code));
     if (error_code) return;
     PathInfo* pi = new PathInfo(tmp, is_open, fillrule,
       brush_color, pen_color, pen_width, show_coords);
@@ -101,7 +101,7 @@ namespace Clipper2Lib {
   {
     int error_code = 0;
     if (paths.size() == 0) return;
-    PathsD tmp = ScalePaths<double, __int128_t>(paths, scale_, error_code);
+    PathsD tmp = ScalePaths<double, Int128>(paths, scale_, error_code);
     if (error_code) return;
     PathInfo* pi = new PathInfo(tmp, is_open, fillrule,
       brush_color, pen_color, pen_width, show_coords);

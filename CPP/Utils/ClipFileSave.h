@@ -11,7 +11,7 @@ namespace Clipper2Lib {
 
   bool SaveTest(const std::string& filename, bool append,
     const Paths64* subj, const Paths64* subj_open, const Paths64* clip, 
-                __int128_t area, __int128_t count, ClipType ct, FillRule fr);
+                Int128 area, Int128 count, ClipType ct, FillRule fr);
 
 } //end namespace
 

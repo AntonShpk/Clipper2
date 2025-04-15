@@ -32,10 +32,10 @@ namespace Clipper2Lib {
   // 'Local Maxima' are where ascending and descending bounds join at the top.
 
   struct Scanline {
-    __int128_t y = 0;
+    Int128 y = 0;
     Scanline* next = nullptr;
 
-    explicit Scanline(__int128_t y_) : y(y_) {}
+    explicit Scanline(Int128 y_) : y(y_) {}
   };
 
   struct HorzSegSorter {
@@ -124,11 +124,11 @@ namespace Clipper2Lib {
       return std::numeric_limits<double>::max();
   }
 
-  inline __int128_t TopX(const Active& ae, const __int128_t currentY)
+  inline Int128 TopX(const Active& ae, const Int128 currentY)
   {
     if ((currentY == ae.top.y) || (ae.top.x == ae.bot.x)) return ae.top.x;
     else if (currentY == ae.bot.y) return ae.bot.x;
-    else return ae.bot.x + static_cast<__int128_t>(nearbyint(ae.dx * (currentY - ae.bot.y)));
+    else return ae.bot.x + static_cast<Int128>(nearbyint(ae.dx * (currentY - ae.bot.y)));
     // nb: std::nearbyint (or std::round) substantially *improves* performance here
     // as it greatly improves the likelihood of edge adjacency in ProcessIntersectList().
   }
@@ -765,7 +765,7 @@ namespace Clipper2Lib {
   void ClipperBase::CleanUp()
   {
     DeleteEdges(actives_);
-    scanline_list_ = std::priority_queue<__int128_t>();
+    scanline_list_ = std::priority_queue<Int128>();
     intersect_nodes_.clear();
     DisposeAllOutRecs();
     horz_seg_list_.clear();
@@ -854,13 +854,13 @@ namespace Clipper2Lib {
     }
   }
 
-  void ClipperBase::InsertScanline(__int128_t y)
+  void ClipperBase::InsertScanline(Int128 y)
   {
     scanline_list_.push(y);
   }
 
 
-  bool ClipperBase::PopScanline(__int128_t& y)
+  bool ClipperBase::PopScanline(Int128& y)
   {
     if (scanline_list_.empty()) return false;
     y = scanline_list_.top();
@@ -871,7 +871,7 @@ namespace Clipper2Lib {
   }
 
 
-  bool ClipperBase::PopLocalMinima(__int128_t y, LocalMinima*& local_minima)
+  bool ClipperBase::PopLocalMinima(Int128 y, LocalMinima*& local_minima)
   {
     if (current_locmin_iter_ == minima_list_.end() || (*current_locmin_iter_)->vertex->pt.y != y) return false;
     local_minima = (current_locmin_iter_++)->get();
@@ -1139,7 +1139,7 @@ namespace Clipper2Lib {
         newcomer.top, NextVertex(newcomer)->pt) >= 0;
     }
 
-    __int128_t y = newcomer.bot.y;
+    Int128 y = newcomer.bot.y;
     bool newcomerIsLeft = newcomer.is_left_bound;
 
     if (resident.bot.y != y || resident.local_min->vertex->pt.y != y)
@@ -1197,7 +1197,7 @@ namespace Clipper2Lib {
   }
 
 
-  void ClipperBase::InsertLocalMinimaIntoAEL(__int128_t bot_y)
+  void ClipperBase::InsertLocalMinimaIntoAEL(Int128 bot_y)
   {
     LocalMinima* local_minima;
     Active* left_bound, * right_bound;
@@ -2007,7 +2007,7 @@ namespace Clipper2Lib {
     }
     else
     {
-      __int128_t e1Wc2, e2Wc2;
+      Int128 e1Wc2, e2Wc2;
       switch (fillrule_)
       {
       case FillRule::EvenOdd:
@@ -2101,7 +2101,7 @@ namespace Clipper2Lib {
   }
 
 
-  inline void ClipperBase::AdjustCurrXAndCopyToSEL(const __int128_t top_y)
+  inline void ClipperBase::AdjustCurrXAndCopyToSEL(const Int128 top_y)
   {
     Active* e = actives_;
     sel_ = e;
@@ -2124,7 +2124,7 @@ namespace Clipper2Lib {
     fillrule_ = fillrule;
     using_polytree_ = use_polytrees;
     Reset();
-    __int128_t y;
+    Int128 y;
     if (ct == ClipType::NoClip || !PopScanline(y)) return true;
 
     while (succeeded_)
@@ -2179,7 +2179,7 @@ namespace Clipper2Lib {
     OutPt* op = hs.left_op;
     OutRec* outrec = GetRealOutRec(op->outrec);
     bool outrecHasEdges = outrec->front_edge;
-    __int128_t curr_y = op->pt.y;
+    Int128 curr_y = op->pt.y;
     OutPt* opP = op, * opN = op;
     if (outrecHasEdges)
     {
@@ -2227,7 +2227,7 @@ namespace Clipper2Lib {
         if ((hs2->left_op->pt.x >= hs1->right_op->pt.x) ||
           (hs2->left_to_right == hs1->left_to_right) ||
           (hs2->right_op->pt.x <= hs1->left_op->pt.x)) continue;
-        __int128_t curr_y = hs1->left_op->pt.y;
+        Int128 curr_y = hs1->left_op->pt.y;
         if (hs1->left_to_right)
         {
           while (hs1->left_op->next->pt.y == curr_y &&
@@ -2336,7 +2336,7 @@ namespace Clipper2Lib {
     }
   }
 
-  void ClipperBase::DoIntersections(const __int128_t top_y)
+  void ClipperBase::DoIntersections(const Int128 top_y)
   {
     if (BuildIntersectList(top_y))
     {
@@ -2345,7 +2345,7 @@ namespace Clipper2Lib {
     }
   }
 
-  void ClipperBase::AddNewIntersectNode(Active& e1, Active& e2, __int128_t top_y)
+  void ClipperBase::AddNewIntersectNode(Active& e1, Active& e2, Int128 top_y)
   {
     Point64 ip;
     if (!GetSegmentIntersectPt(e1.bot, e1.top, e2.bot, e2.top, ip))
@@ -2379,7 +2379,7 @@ namespace Clipper2Lib {
     intersect_nodes_.emplace_back(&e1, &e2, ip);
   }
 
-  bool ClipperBase::BuildIntersectList(const __int128_t top_y)
+  bool ClipperBase::BuildIntersectList(const Int128 top_y)
   {
     if (!actives_ || !actives_->next_in_ael) return false;
 
@@ -2501,7 +2501,7 @@ namespace Clipper2Lib {
   }
 
   bool ClipperBase::ResetHorzDirection(const Active& horz,
-    const Vertex* max_vertex, __int128_t& horz_left, __int128_t& horz_right)
+    const Vertex* max_vertex, Int128& horz_left, Int128& horz_right)
   {
     if (horz.bot.x == horz.top.x)
     {
@@ -2544,7 +2544,7 @@ namespace Clipper2Lib {
   {
     Point64 pt;
     bool horzIsOpen = IsOpen(horz);
-    __int128_t y = horz.bot.y;
+    Int128 y = horz.bot.y;
     Vertex* vertex_max;
     if (horzIsOpen)
       vertex_max = GetCurrYMaximaVertex_Open(horz);
@@ -2556,7 +2556,7 @@ namespace Clipper2Lib {
     //if (!horzIsOpen && vertex_max != horz.vertex_top)
     //  TrimHorz(horz, PreserveCollinear);
 
-    __int128_t horz_left, horz_right;
+    Int128 horz_left, horz_right;
     bool is_left_to_right =
       ResetHorzDirection(horz, vertex_max, horz_left, horz_right);
 
@@ -2697,7 +2697,7 @@ namespace Clipper2Lib {
     UpdateEdgeIntoAEL(&horz); // end of an intermediate horiz.
   }
 
-  void ClipperBase::DoTopOfScanbeam(const __int128_t y)
+  void ClipperBase::DoTopOfScanbeam(const Int128 y)
   {
     sel_ = nullptr;  // sel_ is reused to flag horizontals (see PushHorz below)
     Active* e = actives_;
