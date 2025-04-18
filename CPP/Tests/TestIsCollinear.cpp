@@ -26,18 +26,19 @@ TEST(Clipper2Tests, TestCarryCalculation) {
 
 TEST(Clipper2Tests, TestIsCollinear) {
   // a large integer not representable by double
-  const int64_t i = 9007199254740993;
+  const Int128 i = 1329227995784915872903807060280344576_int128_t; //2^120
 
   const Clipper2Lib::Point64 pt1(0, 0);
   const Clipper2Lib::Point64 sharedPt(i, i * 10);
   const Clipper2Lib::Point64 pt2(i * 10, i * 100);
-
-  EXPECT_TRUE(IsCollinear(pt1, sharedPt, pt2));
+  const bool isCollinear = IsCollinear(pt1, sharedPt, pt2);
+  EXPECT_TRUE(isCollinear);
 }
 
 TEST(Clipper2Tests, TestIsCollinear2) {
   // see https://github.com/AngusJohnson/Clipper2/issues/831
-  const Int128 i = 0x4000000000000;
+  const Int128 i = 1329227995784915872903807060280344576_int128_t; //2^120
+
   const Clipper2Lib::Path64 subject = {
     Clipper2Lib::Point64(-i, -i),
     Clipper2Lib::Point64( i, -i),

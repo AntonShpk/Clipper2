@@ -151,11 +151,11 @@ namespace Clipper2Lib {
     if (error_code) return PathsD();
     const double scale = std::pow(10, precision);
     ClipperOffset clip_offset(miter_limit, arc_tolerance * scale);
-    clip_offset.AddPaths(ScalePaths<__int128,double>(paths, scale, error_code), jt, et);
+    clip_offset.AddPaths(ScalePaths<Int128,double>(paths, scale, error_code), jt, et);
     if (error_code) return PathsD();
     Paths64 solution;
     clip_offset.Execute(delta * scale, solution);
-    return ScalePaths<double, __int128>(solution, 1 / scale, error_code);
+    return ScalePaths<double, Int128>(solution, 1 / scale, error_code);
   }
 
   template <typename T>
@@ -170,7 +170,7 @@ namespace Clipper2Lib {
 
   inline Path64 TranslatePath(const Path64& path, Int128 dx, Int128 dy)
   {
-    return TranslatePath<__int128>(path, dx, dy);
+    return TranslatePath<Int128>(path, dx, dy);
   }
 
   inline PathD TranslatePath(const PathD& path, double dx, double dy)
@@ -190,7 +190,7 @@ namespace Clipper2Lib {
 
   inline Paths64 TranslatePaths(const Paths64& paths, Int128 dx, Int128 dy)
   {
-    return TranslatePaths<__int128>(paths, dx, dy);
+    return TranslatePaths<Int128>(paths, dx, dy);
   }
 
   inline PathsD TranslatePaths(const PathsD& paths, double dx, double dy)
@@ -221,9 +221,9 @@ namespace Clipper2Lib {
     const double scale = std::pow(10, precision);
     Rect64 r = ScaleRect<Int128, double>(rect, scale);
     RectClip64 rc(r);
-    Paths64 pp = ScalePaths<__int128, double>(paths, scale, error_code);
+    Paths64 pp = ScalePaths<Int128, double>(paths, scale, error_code);
     if (error_code) return PathsD(); // ie: error_code result is lost
-    return ScalePaths<double, __int128>(
+    return ScalePaths<double, Int128>(
       rc.Execute(pp), 1 / scale, error_code);
   }
 
@@ -251,12 +251,12 @@ namespace Clipper2Lib {
     CheckPrecisionRange(precision, error_code);
     if (error_code) return PathsD();
     const double scale = std::pow(10, precision);
-    Rect64 r = ScaleRect<__int128, double>(rect, scale);
+    Rect64 r = ScaleRect<Int128, double>(rect, scale);
     RectClipLines64 rcl(r);
-    Paths64 p = ScalePaths<__int128, double>(lines, scale, error_code);
+    Paths64 p = ScalePaths<Int128, double>(lines, scale, error_code);
     if (error_code) return PathsD();
     p = rcl.Execute(p);
-    return ScalePaths<double, __int128>(p, 1 / scale, error_code);
+    return ScalePaths<double, Int128>(p, 1 / scale, error_code);
   }
 
   inline PathsD RectClipLines(const RectD& rect, const PathD& line, int precision = 2)
@@ -545,10 +545,10 @@ namespace Clipper2Lib {
     CheckPrecisionRange(precision, error_code);
     if (error_code) return PathD();
     const double scale = std::pow(10, precision);
-    Path64 p = ScalePath<__int128, double>(path, scale, error_code);
+    Path64 p = ScalePath<Int128, double>(path, scale, error_code);
     if (error_code) return PathD();
     p = TrimCollinear(p, is_open_path);
-    return ScalePath<double, __int128>(p, 1/scale, error_code);
+    return ScalePath<double, Int128>(p, 1/scale, error_code);
   }
 
   template <typename T>

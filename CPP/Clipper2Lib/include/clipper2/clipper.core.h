@@ -20,13 +20,60 @@
 #include <cmath>
 
 namespace std {
-    __extension__ inline constexpr __int128 abs(__int128 __x) {
+    __extension__ inline constexpr __int128_t abs(__int128_t __x) {
         return __x >= 0 ? __x : -__x;
     }
 }
 
 using Int128 = __int128_t; //to be able to switch to custom implementation for VS and etc.
 using UInt128 = __uint128_t; //to be able to switch to custom implementation for VS and etc.
+
+constexpr __int128_t operator""_int128_t(const char* x)
+{
+    __int128_t y = 0;
+    int begin = 0;
+    if (x[0] == '-')
+    {
+        begin = 1;
+    }
+    
+    auto base  = 10ll;
+
+    if (strlen(x) > 2)
+    {
+        const char& baseSign = x[1];
+        if (baseSign == 'b' || baseSign == 'B')
+        {
+            base = 2;
+        }
+        else if (baseSign == 'x' || baseSign == 'X')
+        {
+            base = 16;
+        }
+    }
+    
+    for (int i = begin; x[i] != '\0'; ++i)
+    {
+        y *= base;
+        const char& digit = x[i];
+        if ('0' <= digit && digit <= '9')
+        {
+            y += digit - '0';
+        }
+        else if ('A' <= digit && digit <= 'F')
+        {
+            y += digit - 'A' + 10;
+        }
+        else if ('a' <= digit && digit <= 'f')
+        {
+            y += digit - 'a' + 10;
+        }
+    }
+    y = (begin == 1) ? -y : y;
+
+    return y;
+}
+
 
 namespace Clipper2Lib
 {
@@ -122,7 +169,7 @@ namespace Clipper2Lib
   enum class FillRule { EvenOdd, NonZero, Positive, Negative };
 
 #ifdef USINGZ
-  using z_type = __int128;
+  using z_type = Int128;
 #endif
 
   // Point ------------------------------------------------------------------------
@@ -256,7 +303,7 @@ namespace Clipper2Lib
   };
 
   //nb: using 'using' here (instead of typedef) as they can be used in templates
-  using Point64 = Point<__int128>;
+  using Point64 = Point<Int128>;
   using PointD = Point<double>;
 
   template <typename T>
@@ -278,14 +325,14 @@ namespace Clipper2Lib
     return polys;
   }
 
-  using Path64 = Path<__int128>;
+  using Path64 = Path<Int128>;
   using PathD = Path<double>;
   using Paths64 = std::vector< Path64>;
   using PathsD = std::vector< PathD>;
 
   static const Point64 InvalidPoint64 = Point64(
-    (std::numeric_limits<__int128>::max)(),
-    (std::numeric_limits<__int128>::max)());
+    (std::numeric_limits<Int128>::max)(),
+    (std::numeric_limits<Int128>::max)());
   static const PointD InvalidPointD = PointD(
     (std::numeric_limits<double>::max)(),
     (std::numeric_limits<double>::max)());
@@ -304,7 +351,7 @@ namespace Clipper2Lib
   template <typename T>
   struct Rect;
 
-  using Rect64 = Rect<__int128>;
+  using Rect64 = Rect<Int128>;
   using RectD = Rect<double>;
 
   template <typename T>
@@ -710,7 +757,7 @@ namespace Clipper2Lib
     CheckPrecisionRange(precision, error_code);
   }
 
-  inline int TriSign(__int128 x) // returns 0, 1 or -1
+  inline int TriSign(Int128 x) // returns 0, 1 or -1
   {
     return (x > 0) - (x < 0); 
   }
@@ -780,27 +827,27 @@ namespace Clipper2Lib
 
 
   template <typename T>
-  inline double CrossProduct(const Point<T>& pt1, const Point<T>& pt2, const Point<T>& pt3) {
-    return (static_cast<double>(pt2.x - pt1.x) * static_cast<double>(pt3.y -
-      pt2.y) - static_cast<double>(pt2.y - pt1.y) * static_cast<double>(pt3.x - pt2.x));
+  inline Int128 CrossProduct(const Point<T>& pt1, const Point<T>& pt2, const Point<T>& pt3) {
+    return (static_cast<Int128>(pt2.x - pt1.x) * static_cast<Int128>(pt3.y -
+      pt2.y) - static_cast<Int128>(pt2.y - pt1.y) * static_cast<Int128>(pt3.x - pt2.x));
   }
 
   template <typename T>
-  inline double CrossProduct(const Point<T>& vec1, const Point<T>& vec2)
+  inline Int128 CrossProduct(const Point<T>& vec1, const Point<T>& vec2)
   {
-    return static_cast<double>(vec1.y * vec2.x) - static_cast<double>(vec2.y * vec1.x);
+    return static_cast<Int128>(vec1.y * vec2.x) - static_cast<Int128>(vec2.y * vec1.x);
   }
 
   template <typename T>
-  inline double DotProduct(const Point<T>& pt1, const Point<T>& pt2, const Point<T>& pt3) {
-    return (static_cast<double>(pt2.x - pt1.x) * static_cast<double>(pt3.x - pt2.x) +
-      static_cast<double>(pt2.y - pt1.y) * static_cast<double>(pt3.y - pt2.y));
+  inline Int128 DotProduct(const Point<T>& pt1, const Point<T>& pt2, const Point<T>& pt3) {
+    return (static_cast<Int128>(pt2.x - pt1.x) * static_cast<Int128>(pt3.x - pt2.x) +
+      static_cast<Int128>(pt2.y - pt1.y) * static_cast<Int128>(pt3.y - pt2.y));
   }
 
   template <typename T>
-  inline double DotProduct(const Point<T>& vec1, const Point<T>& vec2)
+  inline Int128 DotProduct(const Point<T>& vec1, const Point<T>& vec2)
   {
-    return static_cast<double>(vec1.x * vec2.x) + static_cast<double>(vec1.y * vec2.y);
+    return static_cast<Int128>(vec1.x * vec2.x) + static_cast<Int128>(vec1.y * vec2.y);
   }
 
   template <typename T>

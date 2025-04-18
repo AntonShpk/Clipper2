@@ -91,10 +91,10 @@ namespace Clipper2Lib
   {
     int error_code = 0;
     double scale = pow(10, decimalPlaces);
-    Path64 pat64 = ScalePath<__int128, double>(pattern, scale, error_code);
-    Path64 path64 = ScalePath<__int128, double>(path, scale, error_code);
+    Path64 pat64 = ScalePath<Int128, double>(pattern, scale, error_code);
+    Path64 path64 = ScalePath<Int128, double>(path, scale, error_code);
     Paths64 tmp = detail::Union(detail::Minkowski(pat64, path64, true, isClosed), FillRule::NonZero);
-    return ScalePaths<double, __int128>(tmp, 1 / scale, error_code);
+    return ScalePaths<double, Int128>(tmp, 1 / scale, error_code);
   }
 
   inline Paths64 MinkowskiDiff(const Path64& pattern, const Path64& path, bool isClosed)
@@ -106,10 +106,10 @@ namespace Clipper2Lib
   {
     int error_code = 0;
     double scale = pow(10, decimalPlaces);
-    Path64 pat64 = ScalePath<__int128, double>(pattern, scale, error_code);
-    Path64 path64 = ScalePath<__int128, double>(path, scale, error_code);
+    Path64 pat64 = ScalePath<Int128, double>(pattern, scale, error_code);
+    Path64 path64 = ScalePath<Int128, double>(path, scale, error_code);
     Paths64 tmp = detail::Union(detail::Minkowski(pat64, path64, false, isClosed), FillRule::NonZero);
-    return ScalePaths<double, __int128>(tmp, 1 / scale, error_code);
+    return ScalePaths<double, Int128>(tmp, 1 / scale, error_code);
   }
 
 } // Clipper2Lib namespace

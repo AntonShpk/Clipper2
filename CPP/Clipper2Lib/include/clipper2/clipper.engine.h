@@ -376,7 +376,7 @@ namespace Clipper2Lib {
 		double Area() const
 		{
 			return std::accumulate(childs_.cbegin(), childs_.cend(),
-				Clipper2Lib::Area<__int128>(polygon_),
+				Clipper2Lib::Area<Int128>(polygon_),
 				[](double a, const auto& child) {return a + child->Area(); });
 		}
 
@@ -397,7 +397,7 @@ namespace Clipper2Lib {
 		{
 			scale_ = parent ? parent->scale_ : 1.0;
 			int error_code = 0;
-			polygon_ = ScalePath<double, __int128>(path, scale_, error_code);
+			polygon_ = ScalePath<double, Int128>(path, scale_, error_code);
 		}
 
 		explicit PolyPathD(PolyPathD* parent, const PathD& path) : PolyPath(parent)
@@ -572,17 +572,17 @@ namespace Clipper2Lib {
 
 		void AddSubject(const PathsD& subjects)
 		{
-			AddPaths(ScalePaths<__int128, double>(subjects, scale_, error_code_), PathType::Subject, false);
+			AddPaths(ScalePaths<Int128, double>(subjects, scale_, error_code_), PathType::Subject, false);
 		}
 
 		void AddOpenSubject(const PathsD& open_subjects)
 		{
-			AddPaths(ScalePaths<__int128, double>(open_subjects, scale_, error_code_), PathType::Subject, true);
+			AddPaths(ScalePaths<Int128, double>(open_subjects, scale_, error_code_), PathType::Subject, true);
 		}
 
 		void AddClip(const PathsD& clips)
 		{
-			AddPaths(ScalePaths<__int128, double>(clips, scale_, error_code_), PathType::Clip, false);
+			AddPaths(ScalePaths<Int128, double>(clips, scale_, error_code_), PathType::Clip, false);
 		}
 
 		bool Execute(ClipType clip_type, FillRule fill_rule, PathsD& closed_paths)
