@@ -19,6 +19,8 @@
 #include <numeric>
 #include <cmath>
 
+#ifndef __INT128_TOOLS
+#define __INT128_TOOLS
 namespace std {
     __extension__ inline constexpr __int128_t abs(__int128_t __x) {
         return __x >= 0 ? __x : -__x;
@@ -73,6 +75,7 @@ constexpr __int128_t operator""_int128_t(const char* x)
 
     return y;
 }
+#endif
 
 
 namespace Clipper2Lib
@@ -790,12 +793,6 @@ namespace Clipper2Lib
   // returns true if (and only if) a * b == c * d
   inline bool ProductsAreEqual(Int128 a, Int128 b, Int128 c, Int128 d)
   {
-#if (defined(__clang__) || defined(__GNUC__)) && UINTPTR_MAX >= UINT64_MAX
-    const auto ab = static_cast<UInt128>(a) * static_cast<UInt128>(b);
-    const auto cd = static_cast<UInt128>(c) * static_cast<UInt128>(d);
-    return ab == cd;
-#else
-    // nb: unsigned values needed for calculating overflow carry
     const auto abs_a = static_cast<UInt128>(std::abs(a));
     const auto abs_b = static_cast<UInt128>(std::abs(b));
     const auto abs_c = static_cast<UInt128>(std::abs(c));
@@ -809,7 +806,6 @@ namespace Clipper2Lib
     const auto sign_cd = TriSign(c) * TriSign(d);
 
     return abs_ab == abs_cd && sign_ab == sign_cd;
-#endif
   }
 
   template <typename T>
