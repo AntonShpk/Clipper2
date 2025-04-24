@@ -22,7 +22,7 @@
 #ifndef __INT128_TOOLS
 #define __INT128_TOOLS
 namespace std {
-    __extension__ inline constexpr __int128_t abs(__int128_t __x) {
+    __extension__ inline constexpr __uint128_t abs(__int128_t __x) {
         return __x >= 0 ? __x : -__x;
     }
 }
@@ -872,17 +872,26 @@ namespace Clipper2Lib
     size_t cnt = path.size();
     if (cnt < 3) return 0.0;
     double a = 0.0;
+    Int128 yMin = INT128_MAX;
+    for (const auto& vert : path)
+    {
+        if (std::abs(yMin) > std::abs(vert.y))
+        {
+            yMin = vert.y;
+        }
+    }
     typename Path<T>::const_iterator it1, it2 = path.cend() - 1, stop = it2;
     if (!(cnt & 1)) ++stop;
     for (it1 = path.cbegin(); it1 != stop;)
     {
-      a += static_cast<double>(it2->y + it1->y) * (it2->x - it1->x);
-      it2 = it1 + 1;
-      a += static_cast<double>(it1->y + it2->y) * (it1->x - it2->x);
-      it1 += 2;
+        a += static_cast<double>((it2->y - yMin) + (it1->y - yMin )) * (it2->x - it1->x);
+        it2 = it1 + 1;
+        a += static_cast<double>((it1->y - yMin) + (it2->y - yMin )) * (it1->x - it2->x);
+        it1 += 2;
     }
     if (cnt & 1)
-      a += static_cast<double>(it2->y + it1->y) * (it2->x - it1->x);
+        a += static_cast<double>((it2->y - yMin) + (it1->y - yMin)) * (it2->x - it1->x);
+      
     return (a * 0.5);
   }
 
