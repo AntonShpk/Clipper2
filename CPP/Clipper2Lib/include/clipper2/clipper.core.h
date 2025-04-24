@@ -23,7 +23,7 @@
 #define __INT128_TOOLS
 namespace std {
     __extension__ inline constexpr __uint128_t abs(__int128_t __x) {
-        return __x >= 0 ? __x : -__x;
+        return __x >= 0 ? static_cast<__uint128_t>(__x) : static_cast<__uint128_t>(-__x);
     }
 }
 
@@ -873,13 +873,22 @@ namespace Clipper2Lib
     if (cnt < 3) return 0.0;
     double a = 0.0;
     Int128 yMin = INT128_MAX;
+    Int128 yMax = INT128_MIN;
     for (const auto& vert : path)
     {
-        if (std::abs(yMin) > std::abs(vert.y))
+        if (yMin > vert.y)
         {
             yMin = vert.y;
         }
+        if (yMax < vert.y)
+        {
+            yMax = vert.y;
+        }
     }
+      if (TriSign(yMax) != TriSign(yMin))
+      {
+          yMin = 0;
+      }
     typename Path<T>::const_iterator it1, it2 = path.cend() - 1, stop = it2;
     if (!(cnt & 1)) ++stop;
     for (it1 = path.cbegin(); it1 != stop;)
