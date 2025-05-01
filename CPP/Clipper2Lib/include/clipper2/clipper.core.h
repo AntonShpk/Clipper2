@@ -1,8 +1,8 @@
 /*******************************************************************************
 * Author    :  Angus Johnson                                                   *
-* Date      :  12 May 2024                                                     *
+* Date      :  24 March 2025                                                   *
 * Website   :  https://www.angusj.com                                          *
-* Copyright :  Angus Johnson 2010-2024                                         *
+* Copyright :  Angus Johnson 2010-2025                                         *
 * Purpose   :  Core Clipper Library structures and functions                   *
 * License   :  https://www.boost.org/LICENSE_1_0.txt                           *
 *******************************************************************************/
@@ -38,7 +38,7 @@ constexpr __int128_t operator""_int128_t(const char* x)
     {
         begin = 1;
     }
-    
+
     auto base  = 10ll;
 
     if (strlen(x) > 2)
@@ -53,7 +53,7 @@ constexpr __int128_t operator""_int128_t(const char* x)
             base = 16;
         }
     }
-    
+
     for (int i = begin; x[i] != '\0'; ++i)
     {
         y *= base;
@@ -765,29 +765,30 @@ namespace Clipper2Lib
     return (x > 0) - (x < 0); 
   }
 
-  struct MultiplyUInt64Result
+  struct UInt128Struct
   {
-    const UInt128 result = 0;
-    const UInt128 carry = 0;
+    const UInt128 lo = 0;
+    const UInt128 hi = 0;
 
-    bool operator==(const MultiplyUInt64Result& other) const
+    bool operator==(const UInt128Struct& other) const
     {
-      return result == other.result && carry == other.carry;
+      return lo == other.lo && hi == other.hi;
     };
   };
 
-  inline MultiplyUInt64Result Multiply(UInt128 a, UInt128 b) // #834, #835
+  inline UInt128Struct Multiply(UInt128 a, UInt128 b) // #834, #835
   {
+    // note to self - lamba expressions follow
     const auto lo = [](UInt128 x) { return x & 0xFFFFFFFFFFFFFFFF; };
     const auto hi = [](UInt128 x) { return x >> 64; };
 
     const UInt128 x1 = lo(a) * lo(b);
     const UInt128 x2 = hi(a) * lo(b) + hi(x1);
     const UInt128 x3 = lo(a) * hi(b) + lo(x2);
-    const UInt128 result = lo(x3) << 64 | lo(x1);
-    const UInt128 carry = hi(a) * hi(b) + hi(x2) + hi(x3);
+    const UInt128 lobits = lo(x3) << 64 | lo(x1);
+    const UInt128 hibits = hi(a) * hi(b) + hi(x2) + hi(x3);
 
-    return { result, carry };
+    return { lobits, hibits };
   }
 
   // returns true if (and only if) a * b == c * d
@@ -798,13 +799,49 @@ namespace Clipper2Lib
     const auto abs_c = static_cast<UInt128>(std::abs(c));
     const auto abs_d = static_cast<UInt128>(std::abs(d));
 
-    const auto abs_ab = Multiply(abs_a, abs_b);
-    const auto abs_cd = Multiply(abs_c, abs_d);
+    const auto ab = Multiply(abs_a, abs_b);
+    const auto cd = Multiply(abs_c, abs_d);
 
     // nb: it's important to differentiate 0 values here from other values
     const auto sign_ab = TriSign(a) * TriSign(b);
     const auto sign_cd = TriSign(c) * TriSign(d);
 
+    return ab == cd && sign_ab == sign_cd;
+  }
+
+  template <typename T>
+  inline int CrossProductSign(const Point<T>& pt1, const Point<T>& pt2, const Point<T>& pt3)
+  {
+    const auto a = pt2.x - pt1.x;
+    const auto b = pt3.y - pt2.y;
+    const auto c = pt2.y - pt1.y;
+    const auto d = pt3.x - pt2.x;
+
+    // nb: unsigned values needed for calculating carry into 'hi'
+    const auto abs_a = static_cast<UInt128>(std::abs(a));
+    const auto abs_b = static_cast<UInt128>(std::abs(b));
+    const auto abs_c = static_cast<UInt128>(std::abs(c));
+    const auto abs_d = static_cast<UInt128>(std::abs(d));
+
+    const auto ab = Multiply(abs_a, abs_b);
+    const auto cd = Multiply(abs_c, abs_d);
+
+    const auto sign_ab = TriSign(a) * TriSign(b);
+    const auto sign_cd = TriSign(c) * TriSign(d);
+
+    if (sign_ab == sign_cd)
+    {
+      int result;
+      if (ab.hi == cd.hi)
+      {
+        if (ab.lo == cd.lo) return 0;
+        result = (ab.lo > cd.lo) ? 1 : -1;
+      }
+      else result = (ab.hi > cd.hi) ? 1 : -1;
+      return (sign_ab > 0) ? result : -result;
+    }
+    return (sign_ab > sign_cd) ? 1 : -1;
+#endif
     return abs_ab == abs_cd && sign_ab == sign_cd;
   }
 
@@ -900,7 +937,7 @@ namespace Clipper2Lib
     }
     if (cnt & 1)
         a += static_cast<double>((it2->y - yMin) + (it1->y - yMin)) * (it2->x - it1->x);
-      
+
     return (a * 0.5);
   }
 

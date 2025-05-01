@@ -2,26 +2,26 @@
 #include "clipper2/clipper.h"
 
 TEST(Clipper2Tests, TestCarryCalculation) {
-  EXPECT_EQ(Clipper2Lib::Multiply(0x51eaed81157de061, 0x3a271fb2745b6fe9).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x3a271fb2745b6fe9, 0x51eaed81157de061).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0xc2055706a62883fa, 0x26c78bc79c2322cc).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x26c78bc79c2322cc, 0xc2055706a62883fa).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x874ddae32094b0de, 0x9b1559a06fdf83e0).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x9b1559a06fdf83e0, 0x874ddae32094b0de).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x81fb3ad3636ca900, 0x239c000a982a8da4).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x239c000a982a8da4, 0x81fb3ad3636ca900).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x4be0b4c5d2725c44, 0x990cd6db34a04c30).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x990cd6db34a04c30, 0x4be0b4c5d2725c44).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x978ec0c0433c01f6, 0x2df03d097966b536).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x2df03d097966b536, 0x978ec0c0433c01f6).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x49c5cbbcfd716344, 0xc489e3b34b007ad3).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0xc489e3b34b007ad3, 0x49c5cbbcfd716344).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0xd3361cdbeed655d5, 0x1240da41e324953a).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x1240da41e324953a, 0xd3361cdbeed655d5).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x51b854f8e71b0ae0, 0x6f8d438aae530af5).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0x6f8d438aae530af5, 0x51b854f8e71b0ae0).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0xbbecf7dbc6147480, 0xbb0f73d0f82e2236).carry, 0);
-  EXPECT_EQ(Clipper2Lib::Multiply(0xbb0f73d0f82e2236, 0xbbecf7dbc6147480).carry, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x51eaed81157de061, 0x3a271fb2745b6fe9).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x3a271fb2745b6fe9, 0x51eaed81157de061).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0xc2055706a62883fa, 0x26c78bc79c2322cc).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x26c78bc79c2322cc, 0xc2055706a62883fa).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x874ddae32094b0de, 0x9b1559a06fdf83e0).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x9b1559a06fdf83e0, 0x874ddae32094b0de).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x81fb3ad3636ca900, 0x239c000a982a8da4).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x239c000a982a8da4, 0x81fb3ad3636ca900).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x4be0b4c5d2725c44, 0x990cd6db34a04c30).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x990cd6db34a04c30, 0x4be0b4c5d2725c44).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x978ec0c0433c01f6, 0x2df03d097966b536).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x2df03d097966b536, 0x978ec0c0433c01f6).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x49c5cbbcfd716344, 0xc489e3b34b007ad3).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0xc489e3b34b007ad3, 0x49c5cbbcfd716344).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0xd3361cdbeed655d5, 0x1240da41e324953a).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x1240da41e324953a, 0xd3361cdbeed655d5).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x51b854f8e71b0ae0, 0x6f8d438aae530af5).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0x6f8d438aae530af5, 0x51b854f8e71b0ae0).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0xbbecf7dbc6147480, 0xbb0f73d0f82e2236).hi, 0);
+  EXPECT_EQ(Clipper2Lib::Multiply(0xbb0f73d0f82e2236, 0xbbecf7dbc6147480).hi, 0);
 }
 
 TEST(Clipper2Tests, TestIsCollinear) {
