@@ -841,8 +841,6 @@ namespace Clipper2Lib
       return (sign_ab > 0) ? result : -result;
     }
     return (sign_ab > sign_cd) ? 1 : -1;
-#endif
-    return abs_ab == abs_cd && sign_ab == sign_cd;
   }
 
   template <typename T>
