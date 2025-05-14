@@ -113,22 +113,25 @@ namespace Clipper2Lib {
     *               +inf (180deg) <--- o ---> -inf (0deg)                          *
     *******************************************************************************/
 
-  inline double GetDx(const Point64& pt1, const Point64& pt2)
+inline std::pair<Int128, double> GetDx(const Point64& pt1, const Point64& pt2)
   {
-    double dy = double(pt2.y - pt1.y);
+    Int128 dy = pt2.y - pt1.y;
     if (dy != 0)
-      return double(pt2.x - pt1.x) / dy;
+    {
+        double dummy;
+        return {Int128(pt2.x - pt1.x) / dy, std::modf(double(pt2.x - pt1.x) / dy, &dummy)};
+    }
     else if (pt2.x > pt1.x)
-      return -std::numeric_limits<double>::max();
+        return {-std::numeric_limits<__int128_t>::max(), 0};
     else
-      return std::numeric_limits<double>::max();
+        return {std::numeric_limits<__int128_t>::max(), 0};
   }
 
   inline Int128 TopX(const Active& ae, const Int128 currentY)
   {
     if ((currentY == ae.top.y) || (ae.top.x == ae.bot.x)) return ae.top.x;
     else if (currentY == ae.bot.y) return ae.bot.x;
-    else return ae.bot.x + static_cast<Int128>(nearbyint(ae.dx * (currentY - ae.bot.y)));
+    else return ae.bot.x + static_cast<Int128>(ae.dx * (currentY - ae.bot.y) + nearbyint(ae.dx_fraction*(currentY - ae.bot.y)));
     // nb: std::nearbyint (or std::round) substantially *improves* performance here
     // as it greatly improves the likelihood of edge adjacency in ProcessIntersectList().
   }
@@ -142,13 +145,13 @@ namespace Clipper2Lib {
 
   inline bool IsHeadingRightHorz(const Active& e)
   {
-    return e.dx == -std::numeric_limits<double>::max();
+    return e.dx == -std::numeric_limits<__int128_t>::max(); // todo !!!!!!!!!!!!!!!!!!!!!!
   }
 
 
   inline bool IsHeadingLeftHorz(const Active& e)
   {
-    return e.dx == std::numeric_limits<double>::max();
+    return e.dx == std::numeric_limits<__int128_t>::max(); // todo !!!!!!!!!!!!!!!!!!!!!!
   }
 
 
@@ -171,7 +174,9 @@ namespace Clipper2Lib {
 
   inline void SetDx(Active& e)
   {
-    e.dx = GetDx(e.bot, e.top);
+      auto result = GetDx(e.bot, e.top);
+      e.dx = result.first;
+      e.dx_fraction = result.second;
   }
 
   inline Vertex* NextVertex(const Active& e)
@@ -2364,8 +2369,8 @@ namespace Clipper2Lib {
     //point either below or above the scanbeam, so check and correct ...
     if (ip.y > bot_y_ || ip.y < top_y)
     {
-      double abs_dx1 = std::fabs(e1.dx);
-      double abs_dx2 = std::fabs(e2.dx);
+      UInt128 abs_dx1 = std::abs(e1.dx);
+      UInt128 abs_dx2 = std::abs(e2.dx);
       if (abs_dx1 > 100 && abs_dx2 > 100)
       {
         if (abs_dx1 > abs_dx2)

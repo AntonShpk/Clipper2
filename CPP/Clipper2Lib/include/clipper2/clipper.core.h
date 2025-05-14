@@ -30,6 +30,49 @@ namespace std {
 using Int128 = __int128_t; //to be able to switch to custom implementation for VS and etc.
 using UInt128 = __uint128_t; //to be able to switch to custom implementation for VS and etc.
 
+constexpr __uint128_t operator""_uint128_t(const char* x)
+{
+    __uint128_t y = 0;
+    int begin = 0;
+
+    auto base  = 10ull;
+
+//    if (strlen(x) > 2)
+    {
+        const char& baseSign = x[1];
+        if (baseSign == 'b' || baseSign == 'B')
+        {
+            base = 2;
+            begin = 2;
+        }
+        else if (baseSign == 'x' || baseSign == 'X')
+        {
+            base = 16;
+            begin = 2;
+        }
+    }
+
+    for (int i = begin; x[i] != '\0'; ++i)
+    {
+        y *= base;
+        const char& digit = x[i];
+        if ('0' <= digit && digit <= '9')
+        {
+            y += static_cast<__uint128_t>(digit - '0');
+        }
+        else if ('A' <= digit && digit <= 'F')
+        {
+            y += static_cast<__uint128_t>(digit - 'A' + 10);
+        }
+        else if ('a' <= digit && digit <= 'f')
+        {
+            y += static_cast<__uint128_t>(digit - 'a' + 10);
+        }
+    }
+
+    return y;
+}
+
 constexpr __int128_t operator""_int128_t(const char* x)
 {
     __int128_t y = 0;
@@ -47,10 +90,12 @@ constexpr __int128_t operator""_int128_t(const char* x)
         if (baseSign == 'b' || baseSign == 'B')
         {
             base = 2;
+            begin = 2;
         }
         else if (baseSign == 'x' || baseSign == 'X')
         {
             base = 16;
+            begin = 2;
         }
     }
 
@@ -75,6 +120,241 @@ constexpr __int128_t operator""_int128_t(const char* x)
 
     return y;
 }
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Int256 - class that very minimally supports 128bit integer math
+//////////////////////////////////////////////////////////////////////////////////////
+
+class Int256
+{
+public:
+    UInt128 lo;
+    Int128 hi;
+
+    Int256(Int128 _lo = 0)
+    : lo {static_cast<UInt128>(_lo)}
+    , hi {_lo < 0 ?  -1 : 0}
+    {
+    }
+
+//    Int256(const Int256& val) : lo(val.lo), hi(val.hi) {}
+
+    Int256(const Int128& _hi, const UInt128& _lo) : lo(_lo), hi(_hi) {}
+
+    Int256& operator = (const Int128& val)
+    {
+        lo = static_cast<UInt128>(val);
+        if (val < 0) hi = -1; else hi = 0;
+        return *this;
+    }
+
+    bool operator == (const Int256& val) const
+    {
+        return (hi == val.hi && lo == val.lo);
+    }
+
+    bool operator != (const Int256& val) const
+    {
+        return !(*this == val);
+    }
+
+    bool operator > (const Int256& val) const
+    {
+        return (hi != val.hi) ? hi > val.hi: lo > val.lo;
+    }
+
+    bool operator < (const Int256& val) const
+    {
+        return (hi != val.hi) ? hi < val.hi : lo < val.lo;
+    }
+
+    bool operator >= (const Int256& val) const
+    {
+        return !(*this < val);
+    }
+
+    bool operator <= (const Int256& val) const
+    {
+        return !(*this > val);
+    }
+
+    bool is_zero() const
+    {
+        return (hi == 0 && lo == 0);
+    }
+
+    bool is_negative() const
+    {
+        return (hi < 0);
+    }
+
+    Int256& operator += (const Int256& rhs)
+    {
+        hi += rhs.hi;
+        lo += rhs.lo;
+        if (lo < rhs.lo) ++hi;
+        return *this;
+    }
+
+    Int256 operator + (const Int256& rhs) const
+    {
+        Int256 result(*this);
+        result += rhs;
+        return result;
+    }
+
+    Int256& operator -= (const Int256& rhs)
+    {
+        *this += -rhs;
+        return *this;
+    }
+
+    Int256 operator - (const Int256& rhs) const
+    {
+        Int256 result(*this);
+        result -= rhs;
+        return result;
+    }
+
+    Int256 operator-() const //unary negation
+    {
+        return  (lo == 0) ? Int256(-hi, 0) : Int256(~hi, ~lo + 1);
+    }
+
+    void negate()
+    {
+        if (lo == 0) hi = -hi;
+        else { hi = ~hi; lo = ~lo + 1; }
+    }
+
+//  operator double() const
+//  {
+//    const double shift64 = 18446744073709551616.0; //2^64
+//    if (hi < 0)
+//    {
+//      if (lo == 0) return (double)hi * shift64;
+//      else return -(double)(~lo + ~hi * shift64);
+//    }
+//    else
+//      return (double)(lo + hi * shift64);
+//  }
+};
+
+static inline Int256 multiply(Int128 lhs, Int128 rhs)
+{
+    const bool negate = (lhs < 0) != (rhs < 0);
+
+    if (lhs < 0) lhs = -lhs;
+    UInt128 int1Hi = UInt128(lhs) >> 64;
+    UInt128 int1Lo = UInt128(lhs & 0xFFFFFFFFFFFFFFFF);
+
+    if (rhs < 0) rhs = -rhs;
+    UInt128 int2Hi = UInt128(rhs) >> 64;
+    UInt128 int2Lo = UInt128(rhs & 0xFFFFFFFFFFFFFFFF);
+
+    UInt128 a = int1Hi * int2Hi;
+    UInt128 b = int1Lo * int2Lo;
+    UInt128 c = int1Hi * int2Lo + int1Lo * int2Hi;
+
+    Int256 result;
+    result.hi = static_cast<Int128>(a + (c >> 64));
+    result.lo = c << 64;
+    result.lo += b;
+    if (result.lo < b) ++result.hi;
+    return negate ? -result : result;
+};
+
+static Int128 divide(Int256 dividend, Int256 divisor)
+{
+  // this function assumes that the parameter values will
+  // generate a result that fits into a 64bit integer.
+  bool negate = (divisor.hi < 0) != (dividend.hi < 0);
+  if (dividend.hi < 0) dividend = -dividend;
+  if (divisor.hi < 0) divisor = -divisor;
+  if (divisor.lo == 0 && divisor.hi == 0)
+    throw "Int256: divide by zero error";
+
+  if (dividend == divisor) return negate ? -1 : 1;
+  if (divisor > dividend) return 0;
+
+    Int256 cntr = Int256(1);
+  while (divisor.hi >= 0 && divisor <= dividend)
+  {
+    divisor.hi <<= 1;
+      if ((Int128)divisor.lo < 0) divisor.hi++;
+    divisor.lo <<= 1;
+
+    cntr.hi <<= 1;
+    if ((Int128)cntr.lo < 0) cntr.hi++;
+    cntr.lo <<= 1;
+  }
+  divisor.lo >>= 1;
+  if (divisor.hi & 1)
+    divisor.lo |= static_cast<__uint128_t>(0x80000000000000000000000000000000_uint128_t);
+  divisor.hi >>= 1;
+
+  cntr.lo >>= 1;
+  if (cntr.hi & 1)
+    cntr.lo |= static_cast<__uint128_t>(0x80000000000000000000000000000000_uint128_t);
+  cntr.hi >>= 1;
+
+    Int256 result = Int256(0);
+  while (cntr.hi != 0 || cntr.lo != 0)
+  {
+    if (dividend >= divisor)
+    {
+      dividend -= divisor;
+      result.hi |= cntr.hi;
+      result.lo |= cntr.lo;
+    }
+    divisor.lo >>= 1;
+    if (divisor.hi & 1)
+      divisor.lo |= static_cast<__uint128_t>(0x80000000000000000000000000000000_uint128_t);
+    divisor.hi >>= 1;
+
+    cntr.lo >>= 1;
+    if (cntr.hi & 1)
+      cntr.lo |= static_cast<__uint128_t>(0x80000000000000000000000000000000_uint128_t);
+    cntr.hi >>= 1;
+  }
+  if (result.hi || (Int128)result.lo < 0)
+    return negate ? INT64_MIN : INT64_MAX;
+  else
+    return negate ? -(Int128)result.lo : (Int128)result.lo;
+}
+
+static inline Int128 muldiv(Int256 lhs, Int128 rhs, Int256 divisor)
+{
+  // this function assumes that the parameter values will
+  // generate a result that fits into a 64bit integer.
+    Int128 sign = (lhs.is_negative() != divisor.is_negative()) != (rhs < 0) ? -2 : 2;
+  if (lhs.is_negative()) lhs.negate();
+  if (divisor.is_negative()) divisor.negate();
+  if (rhs < 0) rhs = -rhs;
+
+  // if 'lhs' is very large, then 'divisor' will be very large too
+  while (lhs.hi && divisor.hi)
+  {
+    // divide dividend and divisor by 2 ...
+    lhs.lo >>= 1;
+    if (lhs.hi & 1)
+      lhs.lo |= 0x80000000000000000000000000000000_uint128_t;
+    lhs.hi >>= 1;
+    divisor.lo >>= 1;
+    if (divisor.hi & 1)
+      divisor.lo |= 0x80000000000000000000000000000000_uint128_t;
+    divisor.hi >>= 1;
+  }
+
+  lhs.lo >>= 1; // divide by 2 to avoid casting a 'sign' bit
+    Int256 result = multiply((Int128)lhs.lo, rhs);
+  result.hi += lhs.hi * rhs;
+  return divide(result, divisor) * sign; // and multiplies by 2
+};
+
 #endif
 
 
@@ -970,51 +1250,26 @@ namespace Clipper2Lib
   template<typename T>
   inline bool GetSegmentIntersectPt(const Point<T>& ln1a, const Point<T>& ln1b,
     const Point<T>& ln2a, const Point<T>& ln2b, Point<T>& ip)
+{
+  Int128 dx1 = ln1b.x - ln1a.x;
+  Int128 dy1 = ln1b.y - ln1a.y;
+  Int128 dx2 = ln2b.x - ln2a.x;
+  Int128 dy2 = ln2b.y - ln2a.y;
+  Int256 det = multiply(dy1, dx2) - multiply(dy2, dx1);
+  if (det.is_zero()) return false;
+
+  Int256 t_num = multiply(ln1a.x - ln2a.x, dy2) - multiply(ln1a.y - ln2a.y, dx2);
+  bool is_negative = t_num.is_negative() != det.is_negative();
+  if (t_num.is_zero() || is_negative)
+    ip = ln1a;
+  else if (t_num.is_negative() == -t_num > -det)
+    ip = ln1b;
+  else
   {
-    double ln1dy = static_cast<double>(ln1b.y - ln1a.y);
-    double ln1dx = static_cast<double>(ln1a.x - ln1b.x);
-    double ln2dy = static_cast<double>(ln2b.y - ln2a.y);
-    double ln2dx = static_cast<double>(ln2a.x - ln2b.x);
-    double det = (ln2dy * ln1dx) - (ln1dy * ln2dx);
-    if (det == 0.0) return false;
-    T bb0minx = CC_MIN(ln1a.x, ln1b.x);
-    T bb0miny = CC_MIN(ln1a.y, ln1b.y);
-    T bb0maxx = CC_MAX(ln1a.x, ln1b.x);
-    T bb0maxy = CC_MAX(ln1a.y, ln1b.y);
-    T bb1minx = CC_MIN(ln2a.x, ln2b.x);
-    T bb1miny = CC_MIN(ln2a.y, ln2b.y);
-    T bb1maxx = CC_MAX(ln2a.x, ln2b.x);
-    T bb1maxy = CC_MAX(ln2a.y, ln2b.y);
-
-    if constexpr (std::is_integral_v<T>)
-    {
-      int64_t originx = (CC_MIN(bb0maxx, bb1maxx) + CC_MAX(bb0minx, bb1minx)) >> 1;
-      int64_t originy = (CC_MIN(bb0maxy, bb1maxy) + CC_MAX(bb0miny, bb1miny)) >> 1;
-      double ln0c = (ln1dy * static_cast<double>(ln1a.x - originx)) +
-        (ln1dx * static_cast<double>(ln1a.y - originy));
-      double ln1c = (ln2dy * static_cast<double>(ln2a.x - originx)) +
-        (ln2dx * static_cast<double>(ln2a.y - originy));
-      double hitx = ((ln1dx * ln1c) - (ln2dx * ln0c)) / det;
-      double hity = ((ln2dy * ln0c) - (ln1dy * ln1c)) / det;
-
-      ip.x = originx + (T)nearbyint(hitx);
-      ip.y = originy + (T)nearbyint(hity);
-    }
-    else
-    {
-      double originx = (CC_MIN(bb0maxx, bb1maxx) + CC_MAX(bb0minx, bb1minx)) / 2.0;
-      double originy = (CC_MIN(bb0maxy, bb1maxy) + CC_MAX(bb0miny, bb1miny)) / 2.0;
-      double ln0c = (ln1dy * static_cast<double>(ln1a.x - originx)) +
-        (ln1dx * static_cast<double>(ln1a.y - originy));
-      double ln1c = (ln2dy * static_cast<double>(ln2a.x - originx)) +
-        (ln2dx * static_cast<double>(ln2a.y - originy));
-      double hitx = ((ln1dx * ln1c) - (ln2dx * ln0c)) / det;
-      double hity = ((ln2dy * ln0c) - (ln1dy * ln1c)) / det;
-
-      ip.x = originx + static_cast<T>(hitx);
-      ip.y = originy + static_cast<T>(hity);
-    }
-    return true;
+    ip.x = ln1a.x + muldiv(t_num, dx1, det);
+    ip.y = ln1a.y + muldiv(t_num, dy1, det);
+  }
+  return true;
 }
 #else
   template<typename T>

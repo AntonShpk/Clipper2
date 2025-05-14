@@ -37,7 +37,7 @@ TEST(Clipper2Tests, TestIsCollinear) {
 
 TEST(Clipper2Tests, TestIsCollinear2) {
   // see https://github.com/AngusJohnson/Clipper2/issues/831
-  const Int128 i = 1329227995784915872903807060280344576_int128_t; //2^120
+  const Int128 i = 42535295865117307932921825928971026432_int128_t; //2^125
 
   const Clipper2Lib::Path64 subject = {
     Clipper2Lib::Point64(-i, -i),
@@ -49,5 +49,71 @@ TEST(Clipper2Tests, TestIsCollinear2) {
   clipper.AddSubject({ subject });
   Clipper2Lib::Paths64 solution;
   clipper.Execute(Clipper2Lib::ClipType::Union, Clipper2Lib::FillRule::EvenOdd, solution);
+
+    const Clipper2Lib::Paths64 expected = {
+        { Clipper2Lib::Point64(i, i), Clipper2Lib::Point64(-i, i), Clipper2Lib::Point64(0,  0) },
+        { Clipper2Lib::Point64(0, 0), Clipper2Lib::Point64(-i,-i), Clipper2Lib::Point64(i, -i) }
+    };
+    EXPECT_EQ(expected, solution);
+}
+
+TEST(Clipper2Tests, Test2Triangles) {
+  const Int128 i = 42535295865117307932921825928971026432_int128_t; //2^125
+
+  const Clipper2Lib::Paths64 subject = {
+      {
+          Clipper2Lib::Point64( i, 2_int128_t),
+          Clipper2Lib::Point64(-i, 2_int128_t),
+          Clipper2Lib::Point64( i, 0_int128_t),
+      },
+      {
+          Clipper2Lib::Point64( i, 0_int128_t),
+          Clipper2Lib::Point64(-i,-2_int128_t),
+          Clipper2Lib::Point64( i,-2_int128_t),
+      }
+  };
+    
+  Clipper2Lib::Clipper64 clipper;
+  clipper.AddSubject(subject);
+  Clipper2Lib::Paths64 solution;
+  clipper.Execute(Clipper2Lib::ClipType::Union, Clipper2Lib::FillRule::EvenOdd, solution);
   EXPECT_EQ(solution.size(), 2);
+    EXPECT_EQ(subject, solution);
+}
+
+TEST(Clipper2Tests, TestTriangleAndRect) {
+    const Int128 halfWide = 42535295865117307932921825928971026432_int128_t; //2^125
+
+
+    const Clipper2Lib::Paths64 subjects = {
+    {
+        Clipper2Lib::Point64( halfWide, 1_int128_t),
+        Clipper2Lib::Point64( halfWide, 5_int128_t),
+        Clipper2Lib::Point64( -halfWide, 5_int128_t),
+        Clipper2Lib::Point64( -halfWide, 1_int128_t)
+    },
+    {
+        Clipper2Lib::Point64( halfWide - 2, 2_int128_t),
+        Clipper2Lib::Point64(-halfWide, -1_int128_t),
+        Clipper2Lib::Point64( halfWide - 2, -1_int128_t),
+    }};
+
+    Clipper2Lib::Clipper64 clipper;
+    clipper.AddSubject(subjects);
+    Clipper2Lib::Paths64 solution;
+    clipper.Execute(Clipper2Lib::ClipType::Union, Clipper2Lib::FillRule::Positive, solution);
+
+
+    const Clipper2Lib::Paths64 expected = {
+    {
+//        Clipper2Lib::Point64( halfWide, height),
+//        Clipper2Lib::Point64(-halfWide, height),
+        Clipper2Lib::Point64( halfWide, 0_int128_t),
+    },
+    {
+        Clipper2Lib::Point64( halfWide, 0_int128_t),
+//        Clipper2Lib::Point64(-halfWide,-height),
+//        Clipper2Lib::Point64( halfWide,-height),
+    }};
+    EXPECT_EQ(solution, expected);
 }

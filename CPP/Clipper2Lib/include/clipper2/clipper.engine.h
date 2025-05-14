@@ -105,7 +105,8 @@ namespace Clipper2Lib {
 		Point64 bot;
 		Point64 top;
 		Int128 curr_x = 0;		//current (updated at every new scanline)
-		double dx = 0.0;
+		Int128 dx = 0;
+        double dx_fraction = 0.0;
 		int wind_dx = 1;			//1 or -1 depending on winding direction
 		int wind_cnt = 0;
 		int wind_cnt2 = 0;		//winding count of the opposite polytype

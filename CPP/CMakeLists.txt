@@ -10,8 +10,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # CLIPPER2_HI_PRECISION: See GetIntersectPoint() in clipper.core.h 
-option(CLIPPER2_HI_PRECISION "Caution: enabling this will compromise performance" OFF)
-
+option(CLIPPER2_HI_PRECISION "Caution: enabling this will compromise performance" ON)
+set(CLIPPER2_HI_PRECISION ON)
 option(CLIPPER2_UTILS "Build utilities" ON)
 option(CLIPPER2_EXAMPLES "Build examples" ON)
 option(CLIPPER2_TESTS "Build tests" ON)
